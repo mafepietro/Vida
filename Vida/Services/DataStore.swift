@@ -16,13 +16,16 @@ final class DataStore {
     private init() {
         let configuration = ModelConfiguration(
             schema: Self.schema,
-            isStoredInMemoryOnly: false,
+            isStoredInMemoryOnly: DemoMode.isOn,
             cloudKitDatabase: .none
         )
         do {
             container = try ModelContainer(for: Self.schema, configurations: [configuration])
         } catch {
             fatalError("Não foi possível abrir o banco de dados: \(error)")
+        }
+        if DemoMode.isOn {
+            DemoMode.insertSampleData(into: container.mainContext)
         }
     }
 

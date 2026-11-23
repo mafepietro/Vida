@@ -3,10 +3,11 @@ import SwiftData
 
 struct MedicationListView: View {
     @Query(sort: \Medication.name) private var medications: [Medication]
-    @State private var showingNew = false
+    @State private var showingNew = DemoMode.isOn && DemoMode.screen == "novo"
+    @State private var path: [Medication] = []
 
     var body: some View {
-        NavigationStack {
+        NavigationStack(path: $path) {
             Group {
                 if medications.isEmpty {
                     ContentUnavailableView {
@@ -40,6 +41,12 @@ struct MedicationListView: View {
             }
             .sheet(isPresented: $showingNew) {
                 MedicationEditView(medication: nil)
+            }
+            .onAppear {
+                if DemoMode.isOn, DemoMode.screen == "detalhe", path.isEmpty,
+                   let first = medications.first(where: { $0.name == "Sertralina" }) ?? medications.first {
+                    path = [first]
+                }
             }
         }
     }
